@@ -37,31 +37,46 @@ namespace fc_manager_backend_api.Controllers
         // if (!ModelState.IsValid)
         //     return BadRequest(ModelState);
         var matchRecordIds = new List<int>();
+        var matchRecord = new MatchRecord();
+
+//Need to fix by using match query
+#region ResetMatchScore
+        var currentMatchRecordId = matchRecordsResource.FirstOrDefault().Id;
+        var currentMatchRecord = await _repository.GetMatchRecord(currentMatchRecordId);
+        if (currentMatchRecord != null) {
+            currentMatchRecord.Match.HomeScore = 0;
+            currentMatchRecord.Match.AwayScore = 0;
+        }
+#endregion
 
         foreach(var mr in matchRecordsResource)
         {
             if(mr.Id == 0)
             {
-                var matchRecord = _mapper.Map<SaveMatchRecordResource, MatchRecord>(mr);
-                _repository.Add(matchRecord);
-
+                var newMatchRecord = _mapper.Map<SaveMatchRecordResource, MatchRecord>(mr);
+                _repository.Add(newMatchRecord);
+                //matchrecord생성전
                 await _unitOfWork.CompleteAsync();
-
-                matchRecordIds.Add(matchRecord.Id);
+                matchRecord = await _repository.GetMatchRecord(newMatchRecord.Id);
+            }else {
+                matchRecord = await _repository.GetMatchRecord(mr.Id);
             }
-            else
-            {
-                var matchRecord = await _repository.GetMatchRecord(mr.Id);
 
-                if (matchRecord == null)
-                    return new List<MatchRecordResource>();
+            if (matchRecord == null)
+                return new List<MatchRecordResource>();
 
-                _mapper.Map<SaveMatchRecordResource, MatchRecord>(mr, matchRecord);
+            _mapper.Map<SaveMatchRecordResource, MatchRecord>(mr, matchRecord);
 
-                matchRecordIds.Add(matchRecord.Id);
-                await _unitOfWork.CompleteAsync();
-            }
+            matchRecordIds.Add(matchRecord.Id);      
         }
+
+        //Delete all unselected matchRecords
+        foreach(var mr in currentMatchRecord.Match.MatchRecords.Where(m => !matchRecordIds.Contains(m.Id)))
+        {
+            mr.DeletedAt = DateTime.Now;
+        }
+
+       await _unitOfWork.CompleteAsync(); 
     
         var matchRecords = await _repository.GetMatchRecords(matchRecordIds);
 

@@ -16,6 +16,7 @@ namespace fc_manager_backend_api.Controllers.Resources
         public int AssistTeamId { get; set; }
         public int CodeId { get; set; }
         public int MatchId { get; set; }
+        public bool IsHomeTeam { get; set; }
 
     }
 }

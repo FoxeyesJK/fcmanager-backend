@@ -31,7 +31,10 @@ namespace fc_manager_backend_repository
 
         public async Task<MatchRecord> GetMatchRecord(int id)
         {
-            return await _context.MatchRecords.FindAsync(id);
+            return await _context.MatchRecords
+                                    .Include(mr => mr.Match)
+                                    .ThenInclude(mr => mr.MatchRecords)
+                                    .FirstOrDefaultAsync(f => f.Id == id);
         }
 
         public async Task<IEnumerable<MatchRecord>> GetMatchRecords(int matchId)
@@ -43,6 +46,7 @@ namespace fc_manager_backend_repository
                             .Include(mr => mr.AssistMember)
                                 .ThenInclude(mrm => mrm.TeamMembers)
                             .Include(mr => mr.Type)
+                            .Include(mr => mr.Match)
                             .ToListAsync();
         }
 

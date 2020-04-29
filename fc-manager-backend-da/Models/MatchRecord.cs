@@ -18,6 +18,6 @@ namespace fc_manager_backend_da.Models
         [ForeignKey("Match")]
         public int MatchId { get; set; }
         public virtual Match Match { get; set; }
-        public bool isHomeTeam { get; set; }
+        public bool IsHomeTeam { get; set; }
     }
 }

@@ -48,8 +48,26 @@ namespace fc_manager_backend_api.Mapping
                 .ForMember(m => m.Id, opt => opt.Ignore())
                 .AfterMap((mr, m) => {
                     // Delete unselected MatchRecords
-                    if ((mr.ScoreMemberId == 0 || mr.ScoreMemberId == null) && (mr.AssistMemberId == 0 || mr.AssistMemberId == null))
+                    if (mr.ScoreMemberId == null && mr.AssistMemberId == null)
                         m.DeletedAt = DateTime.Now;
+
+                    // Update Matches when inserting score member
+                    if (mr.ScoreMemberId != null && mr.DeletedAt == null && m.Match != null) {
+                        if (m.IsHomeTeam)
+                            m.Match.HomeScore += 1;
+                        else
+                            m.Match.AwayScore += 1;
+                    }
+
+                    if (mr.ScoreMemberId != null && mr.DeletedAt != null && m.Match != null) {
+                        if (m.IsHomeTeam)
+                            m.Match.HomeScore -= 1;
+                        else
+                            m.Match.AwayScore -= 1;
+                    }
+
+        
+                    // Update Matches when update(delting)
                 });
         }
     }

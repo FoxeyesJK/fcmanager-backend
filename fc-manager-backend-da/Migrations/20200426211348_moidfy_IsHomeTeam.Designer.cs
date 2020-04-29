@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using fc_manager_backend_da.Models;
@@ -9,9 +10,10 @@ using fc_manager_backend_da.Models;
 namespace fc_manager_backend_da.Migrations
 {
     [DbContext(typeof(FCMContext))]
-    partial class FCMContextModelSnapshot : ModelSnapshot
+    [Migration("20200426211348_moidfy_IsHomeTeam")]
+    partial class moidfy_IsHomeTeam
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
